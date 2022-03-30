@@ -320,7 +320,7 @@
             "uid": "Amazon Timestream"
           },
           "measure": "value_sum",
-          "rawQuery": "SELECT time, sum(measure_value::double) AS requests_failed\nFROM \"artemis-db\".\"http_req_failed\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_count'\nAND status = '0'\nGROUP BY time\nORDER BY time ASC",
+          "rawQuery": "SELECT time, sum(measure_value::double) AS requests_failed\nFROM \"artemis-db\".\"http_req_failed\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_count'\nAND (status LIKE '4%' OR status = '0')\nGROUP BY time\nORDER BY time ASC",
           "refId": "A",
           "table": "\"http_reqs\""
         }
