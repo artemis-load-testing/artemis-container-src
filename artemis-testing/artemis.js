@@ -21,7 +21,7 @@ const fetchObject = async (fileName) => {
       if (err) {
         return console.log(err);
       }
-      console.log('The file was saved!');
+      console.log('The test script file has been saved!');
     });
   } catch (e) {
     console.log(e);
@@ -30,12 +30,9 @@ const fetchObject = async (fileName) => {
 
 const runTest = async () => {
   try {
-    console.log('I am about to run, will this work? Wait to find out...');
-    console.log(process.env.TEST_ID);
-    const output = await exec(
-      `k6 run --tag task_count=${process.env.TASK_COUNT} --tag test_id=${process.env.TEST_ID} --out influxdb=http://artemis-telegraf.artemis:8186 script.js`
+    await exec(
+      `k6 run --no-summary --no-thresholds --tag task_count=${process.env.TASK_COUNT} --tag test_id=${process.env.TEST_ID} --out influxdb=http://artemis-telegraf.artemis:8186 script.js`
     );
-    console.log(output.stdout);
     console.log('Test finished running!');
   } catch (e) {
     console.log(e);
