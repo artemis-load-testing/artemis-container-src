@@ -11,4 +11,4 @@ COPY . /test
 WORKDIR /test
 RUN npm ci
 
-CMD [ "node", "run_k6_test.js" ]
+CMD [ "node", "artemis.js" ]
