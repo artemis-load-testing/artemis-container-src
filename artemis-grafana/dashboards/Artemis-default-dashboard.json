@@ -21,7 +21,13 @@
       "type": "datasource",
       "id": "grafana-timestream-datasource",
       "name": "Amazon Timestream",
-      "version": "1.5.0"
+      "version": "1.5.1"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
     },
     {
       "type": "panel",
@@ -53,6 +59,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": null,
+  "iteration": 1649379788875,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -60,35 +67,61 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "id": 10,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.4.4",
+      "targets": [
+        {
+          "database": "\"artemis-db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "Amazon Timestream"
+          },
+          "measure": "value_count",
+          "rawQuery": "SELECT test_id, avg(measure_value::double) as p95\nFROM \"artemis-db\".\"http_req_duration\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_095'\nAND test_id = $artemis_test_id\nGROUP BY test_id",
+          "refId": "A",
+          "table": "\"data_received\""
+        }
+      ],
+      "title": "P95 Response Time",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
           },
           "mappings": [],
           "thresholds": {
@@ -108,23 +141,28 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
-        "w": 24,
-        "x": 0,
+        "h": 3,
+        "w": 6,
+        "x": 6,
         "y": 0
       },
-      "id": 6,
+      "id": 14,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+        "text": {
+          "valueSize": 0
+        },
+        "textMode": "auto"
       },
+      "pluginVersion": "8.4.4",
       "targets": [
         {
           "database": "\"artemis-db\"",
@@ -133,13 +171,135 @@
             "uid": "Amazon Timestream"
           },
           "measure": "value_count",
-          "rawQuery": "SELECT time, (sum(measure_value::double) / 10) AS requests_per_second\nFROM \"artemis-db\".\"http_reqs\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_sum'\nGROUP BY time\nORDER BY time ASC",
+          "rawQuery": "SELECT test_id, (sum(measure_value::double)) AS total_requests\nFROM \"artemis-db\".\"http_reqs\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_sum'\nAND test_id = $artemis_test_id\nGROUP BY test_id",
           "refId": "A",
           "table": "\"data_received\""
         }
       ],
-      "title": "Total Requests/second",
-      "type": "timeseries"
+      "title": "Requests Made",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.4.4",
+      "targets": [
+        {
+          "database": "\"artemis-db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "Amazon Timestream"
+          },
+          "measure": "value_count",
+          "rawQuery": "select max(requests_per_second) FROM (\n  SELECT time, (sum(measure_value::double) / 10) AS requests_per_second\n  FROM \"artemis-db\".\"http_reqs\"\n  WHERE time BETWEEN ago(1d) AND now() \n  AND measure_name = 'value_sum'\n  AND test_id = $artemis_test_id\n  GROUP BY time\n  ORDER BY time ASC\n)",
+          "refId": "A",
+          "table": "\"data_received\""
+        }
+      ],
+      "title": "Peak RPS",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 12,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "valueSize": 0
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.4.4",
+      "targets": [
+        {
+          "database": "\"artemis-db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "Amazon Timestream"
+          },
+          "measure": "value_count",
+          "rawQuery": "SELECT sum(measure_value::double) AS requests_failed\nFROM \"artemis-db\".\"http_req_failed\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_count'\nAND (status LIKE '4%' OR status = '0' OR status LIKE '5%')\nAND test_id = $artemis_test_id",
+          "refId": "A",
+          "table": "\"data_received\""
+        }
+      ],
+      "title": "HTTP Failures",
+      "type": "stat"
     },
     {
       "fieldConfig": {
@@ -196,7 +356,114 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 10
+        "y": 3
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "database": "\"artemis-db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "Amazon Timestream"
+          },
+          "measure": "value_count",
+          "rawQuery": "SELECT time, (sum(measure_value::double) / 10) AS requests_per_second\nFROM \"artemis-db\".\"http_reqs\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_sum'\nAND test_id = $artemis_test_id\nGROUP BY time\nORDER BY time ASC",
+          "refId": "A",
+          "table": "\"data_received\""
+        }
+      ],
+      "title": "Total Requests/second",
+      "type": "timeseries"
+    },
+    {
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 5,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "log": 2,
+              "type": "log"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_col1"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#73BF69",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 13
       },
       "id": 4,
       "options": {
@@ -217,10 +484,47 @@
             "type": "grafana-timestream-datasource",
             "uid": "Amazon Timestream"
           },
-          "measure": "value_sum",
-          "rawQuery": "SELECT time, avg(measure_value::double) AS http_request_duration\nFROM \"artemis-db\".\"http_req_duration\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_mean'\nGROUP BY time\nORDER BY time ASC",
-          "refId": "A",
-          "table": "\"http_req_failed\""
+          "hide": false,
+          "measure": "value_count",
+          "rawQuery": "SELECT time, avg(measure_value::double) as p90\nFROM \"artemis-db\".\"http_req_duration\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_090'\nAND test_id = $artemis_test_id\nGROUP BY time\nORDER BY time ASC",
+          "refId": "B",
+          "table": "\"http_req_duration\""
+        },
+        {
+          "database": "\"artemis-db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "Amazon Timestream"
+          },
+          "hide": false,
+          "measure": "value_count",
+          "rawQuery": "SELECT time, avg(measure_value::double) AS p95\nFROM \"artemis-db\".\"http_req_duration\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_095'\nAND test_id = $artemis_test_id\nGROUP BY time\nORDER BY time ASC",
+          "refId": "C",
+          "table": "\"http_req_blocked\""
+        },
+        {
+          "database": "\"artemis-db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "Amazon Timestream"
+          },
+          "hide": false,
+          "measure": "value_count",
+          "rawQuery": "SELECT time, avg(measure_value::double) AS max\nFROM \"artemis-db\".\"http_req_duration\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_max'\nAND test_id = $artemis_test_id\nGROUP BY time\nORDER BY time ASC",
+          "refId": "D",
+          "table": "\"data_received\""
+        },
+        {
+          "database": "\"artemis-db\"",
+          "datasource": {
+            "type": "grafana-timestream-datasource",
+            "uid": "Amazon Timestream"
+          },
+          "hide": false,
+          "measure": "value_count",
+          "rawQuery": "SELECT time, avg(measure_value::double) AS min\nFROM \"artemis-db\".\"http_req_duration\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_min'\nAND test_id = $artemis_test_id\nGROUP BY time\nORDER BY time ASC",
+          "refId": "E",
+          "table": "\"data_received\""
         }
       ],
       "title": "HTTP Request Duration",
@@ -298,7 +602,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 20
+        "y": 23
       },
       "id": 8,
       "options": {
@@ -320,12 +624,12 @@
             "uid": "Amazon Timestream"
           },
           "measure": "value_sum",
-          "rawQuery": "SELECT time, sum(measure_value::double) AS requests_failed\nFROM \"artemis-db\".\"http_req_failed\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_count'\nAND (status LIKE '4%' OR status = '0')\nGROUP BY time\nORDER BY time ASC",
+          "rawQuery": "SELECT time, sum(measure_value::double) AS requests_failed\nFROM \"artemis-db\".\"http_req_failed\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_count'\nAND (status LIKE '4%' OR status = '0' OR status LIKE '5%')\nAND test_id = $artemis_test_id\nGROUP BY time\nORDER BY time ASC",
           "refId": "A",
           "table": "\"http_reqs\""
         }
       ],
-      "title": "HTTP Request Failures",
+      "title": "HTTP Failures",
       "type": "timeseries"
     },
     {
@@ -339,7 +643,7 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 0,
+            "fillOpacity": 8,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -347,6 +651,9 @@
               "viz": false
             },
             "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -383,7 +690,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 20
+        "y": 23
       },
       "id": 2,
       "options": {
@@ -406,48 +713,52 @@
           },
           "hide": false,
           "measure": "value_sum",
-          "rawQuery": "SELECT time, (avg(measure_value::double) * min(cast(task_count AS bigint))) as vus\nFROM \"artemis-db\".\"vus\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_mean'\nGROUP BY time\nORDER BY time ASC",
+          "rawQuery": "SELECT time, (avg(measure_value::double) * min(cast(task_count AS bigint))) as vus\nFROM \"artemis-db\".\"vus\"\nWHERE time BETWEEN ago(1d) AND now() \nAND measure_name = 'value_mean'\nAND test_id = $artemis_test_id\nGROUP BY time\nORDER BY time ASC",
           "refId": "A",
           "table": "\"http_reqs\""
         }
       ],
-      "title": "VUs",
-      "transformations": [
-        {
-          "id": "calculateField",
-          "options": {
-            "binary": {
-              "left": "measure_value::double",
-              "operator": "*",
-              "reducer": "sum",
-              "right": "10"
-            },
-            "mode": "binary",
-            "reduce": {
-              "reducer": "min"
-            },
-            "replaceFields": true
-          }
-        }
-      ],
+      "title": "Virtual Users (VUs)",
+      "transformations": [],
       "type": "timeseries"
     }
   ],
-  "refresh": "5s",
+  "refresh": "10s",
   "schemaVersion": 35,
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allValue": "",
+        "current": {},
+        "datasource": {
+          "type": "grafana-timestream-datasource",
+          "uid": "Amazon Timestream"
+        },
+        "definition": "SELECT DISTINCT test_id, time FROM \"artemis-db\".\"http_req_duration\" \nWHERE time between ago(1d) and now() \nORDER BY time DESC LIMIT 1\n",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "artemis_test_id",
+        "options": [],
+        "query": "SELECT DISTINCT test_id, time FROM \"artemis-db\".\"http_req_duration\" \nWHERE time between ago(1d) and now() \nORDER BY time DESC LIMIT 1\n",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Artemis",
-  "uid": "QyTECbP7k",
-  "version": 23,
+  "title": "Artemis-2",
+  "uid": "QyTECbP7j",
+  "version": 18,
   "weekStart": ""
 }
