@@ -752,12 +752,12 @@
     ]
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Artemis-2",
+  "title": "Artemis",
   "uid": "QyTECbP7j",
   "version": 18,
   "weekStart": ""
